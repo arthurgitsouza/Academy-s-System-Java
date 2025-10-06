@@ -1,0 +1,14 @@
+Função: É a única camada que sabe como conversar com o banco de dados.
+Sua única responsabilidade é a persistência de dados.
+
+Responsabilidades:
+
+Realizar as operações de CRUD (Create, Read, Update, Delete).
+
+Buscar, salvar, editar e deletar dados nas tabelas do banco.
+
+No mundo Spring, com o Spring Data JPA, você geralmente só define a interface (ex: AlunoRepository) e o framework implementa os métodos para você.
+
+O que ela NÃO faz: Ela não contém nenhuma regra de negócio.
+O Repository não sabe por que está salvando um aluno,
+ele apenas executa a ordem de "salve este aluno".

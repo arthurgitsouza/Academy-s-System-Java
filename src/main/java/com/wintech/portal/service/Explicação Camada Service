@@ -1,0 +1,15 @@
+Função: Aqui é onde mora a lógica de negócio (business logic) da sua aplicação.
+É o cérebro que toma as decisões e orquestra as operações.
+
+
+Responsabilidades:
+
+Implementar as regras de negócio (ex: "para criar um simulado, o professor precisa ter cadastrado pelo menos 10 questões").
+
+Coordenar as ações. Se uma operação precisa salvar algo no banco e depois enviar um email,
+é o Service quem chama o Repository e depois o serviço de email.
+
+Realizar validações complexas que envolvem mais de uma entidade.
+
+O que ela NÃO faz: Ela não sabe o que é uma requisição HTTP e não sabe como o SQL funciona.
+Ela apenas executa as regras e pede os dados para a próxima camada.

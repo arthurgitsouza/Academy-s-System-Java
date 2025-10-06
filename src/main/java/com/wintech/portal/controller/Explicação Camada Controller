@@ -1,0 +1,16 @@
+Função: É a única porta de entrada para o mundo exterior.
+No seu caso, é a camada que recebe as requisições HTTP do seu Front-end Angular.
+
+Responsabilidades:
+
+Expor os endpoints (as URLs, como /api/alunos).
+
+Receber os dados da requisição (JSON, parâmetros da URL, etc.).
+
+Fazer uma validação superficial dos dados (ex: o email não é nulo?).
+
+Chamar o método apropriado na camada de Service.
+
+Pegar a resposta do Service e empacotá-la em uma resposta HTTP (com um status, como 200 OK ou 404 Not Found, e os dados em JSON).
+
+O que ela NÃO faz: Ela não contém regras de negócio e não fala diretamente com o banco de dados. Ela é apenas uma "telefonista" que direciona a chamada.
