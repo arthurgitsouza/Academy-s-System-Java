@@ -1,0 +1,14 @@
+services:
+  postgres-db:
+    image: postgres:18
+    container_name: portal-academico-db
+    environment:
+      POSTGRES_USER: portaluser
+      POSTGRES_PASSWORD: portalpassword
+      POSTGRES_DB: portaldb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+volumes:
+  postgres-data:
