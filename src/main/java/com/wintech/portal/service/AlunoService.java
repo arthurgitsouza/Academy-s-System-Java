@@ -1,6 +1,6 @@
 package com.wintech.portal.service;
 
-import com.wintech.portal.repository.AlunoRepositoy;
+import com.wintech.portal.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
