@@ -6,10 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ComportamentoRepository extends JpaRepository<ComportamentoRepository, Long> {
-    // Buscar registros de comportamento por aluno
-    List<Comportamento> findByAlunoId(Long alunoId);
+public interface ComportamentoRepository extends JpaRepository<Comportamento, Long> {
 
-    // Buscar registros de comportamento por disciplina
-    List<Comportamento> findByDisciplinaId(Long disciplinaId);
 }

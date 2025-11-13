@@ -6,10 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface DisciplinaRepository extends JpaRepository <DisciplinaRepository,Long> {
-    // Buscar disciplinas de uma turma
-    List<Disciplina> findByTurmasId(Long turmaId);
+public interface DisciplinaRepository extends JpaRepository <Disciplina,Long> {
 
-    // Buscar disciplinas por professor
-    List<Disciplina> findByProfessorId(Long professorId);
 }

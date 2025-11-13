@@ -8,12 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ProfessorRepository extends JpaRepository <Professor, Long> {
-    // Buscar professores por disciplina
-    List<Professor> findByDisciplinaId(Long disciplinaId);
 
-    // Buscar professor por nome
-    List<Professor> findByNomeContainingIgnoreCase(String nome);
-
-    // Buscar professor pelo e-mail (login/autenticação)
-    Optional<Professor> findByEmail(String email);
 }
