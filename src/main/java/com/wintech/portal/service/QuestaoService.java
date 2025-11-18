@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 public class QuestaoService {
 
     private final QuestaoRepository repository;
+
     public QuestaoService(QuestaoRepository repository) {
         this.repository = repository;
     }
 
-    public Questao salvar(Questao novaQuestao)  {
+    public Questao salvar(Questao novaQuestao) {
         return repository.save(novaQuestao);
     }
-
 }

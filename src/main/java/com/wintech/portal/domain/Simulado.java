@@ -18,13 +18,10 @@ public class Simulado {
     @Column(name = "data_criacao")
     private LocalDate dataCriacao;
 
-    // Relacionamento: Muitos Simulados podem ser aplicados a Uma Turma.
     @ManyToOne
     @JoinColumn(name = "id_turma", nullable = false)
     private Turma turma;
 
-    // Relacionamento: Um Simulado tem Muitas Questões, e uma Questão pode estar em Muitos Simulados (N:N).
-    // O JPA criará uma tabela de ligação (ex: simulado_questao) automaticamente para nós.
     @ManyToMany
     @JoinTable(
             name = "simulado_questao",
@@ -33,5 +30,48 @@ public class Simulado {
     )
     private List<Questao> questoes;
 
-    // Construtores, Getters e Setters...
+    // Construtores
+    public Simulado() {
+    }
+
+    // Getters e Setters
+    public Long getId_simulado() {
+        return id_simulado;
+    }
+
+    public void setId_simulado(Long id_simulado) {
+        this.id_simulado = id_simulado;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public LocalDate getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDate dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
+    public Turma getTurma() {
+        return turma;
+    }
+
+    public void setTurma(Turma turma) {
+        this.turma = turma;
+    }
+
+    public List<Questao> getQuestoes() {
+        return questoes;
+    }
+
+    public void setQuestoes(List<Questao> questoes) {
+        this.questoes = questoes;
+    }
 }
