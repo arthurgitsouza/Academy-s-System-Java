@@ -13,3 +13,5 @@ Realizar validações complexas que envolvem mais de uma entidade.
 
 O que ela NÃO faz: Ela não sabe o que é uma requisição HTTP e não sabe como o SQL funciona.
 Ela apenas executa as regras e pede os dados para a próxima camada.
+
+

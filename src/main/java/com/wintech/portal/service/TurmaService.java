@@ -1,5 +1,6 @@
 package com.wintech.portal.service;
 
+import com.wintech.portal.domain.Turma;
 import com.wintech.portal.repository.TurmaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,5 +15,8 @@ public class TurmaService {
         this.turmaRepository = turmaRepository;
     }
 
+    public Turma salvar(Turma novaTurma) {
+        return turmaRepository.save(novaTurma);
+    }
     
 }
