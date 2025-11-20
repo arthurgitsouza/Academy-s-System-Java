@@ -15,6 +15,10 @@ public class Aluno {
 
     @Id // Marca o campo como a chave primária (PK).
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Configura a PK para ser autoincrementável.
+    private String nome_aluno;
+
+    private String email;
+    
     private Long id_aluno;
 
     @Column // Mapeia para a coluna 'foto', que pode armazenar a URL da imagem.
@@ -66,6 +70,22 @@ public class Aluno {
     }
 
     // Getters e Setters para todos os campos...
+
+    public String getNome_aluno() {
+        return nome_aluno;
+    }
+
+    public void setNome_aluno(String nome_aluno) {
+        this.nome_aluno = nome_aluno;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public Long getId_aluno() {
         return id_aluno;
