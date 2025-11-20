@@ -10,8 +10,6 @@ public class Questao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_questao;
 
-    // @Lob é usado para textos longos, garantindo espaço para o enunciado.
-    @Lob
     @Column(nullable = false)
     private String enunciado;
 

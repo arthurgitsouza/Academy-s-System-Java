@@ -1,50 +1,57 @@
 package com.wintech.portal.controller;
 
 import com.wintech.portal.domain.Usuario;
+import com.wintech.portal.dto.LoginRequestDTO;
+import com.wintech.portal.dto.LoginResponseDTO;
+import com.wintech.portal.security.JwtUtil; // <--- Mudou de JwtService para JwtUtil
 import com.wintech.portal.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map; // Usaremos um Map para simplificar o recebimento do login
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    // O "cérebro" que este controller vai usar
     private final UsuarioService usuarioService;
+    private final JwtUtil jwtUtil; // <--- Injetando o seu novo Util
 
-    // Injeção do service pelo construtor (o Spring faz isso automaticamente)
     @Autowired
-    public AuthController(UsuarioService usuarioService) {
+    public AuthController(UsuarioService usuarioService, JwtUtil jwtUtil) {
         this.usuarioService = usuarioService;
+        this.jwtUtil = jwtUtil;
     }
 
-    /**
-     * Endpoint de Login.
-     * @PostMapping: Responde a requisições do tipo POST (envio de dados).
-     * "/login": É o caminho final do endpoint. (URL completa: /api/auth/login)
-     */
     @PostMapping("/login")
-    public ResponseEntity<?> fazerLogin(@RequestBody Map<String, String> loginRequest) {
-        // @RequestBody: Pega o JSON enviado pelo front-end e transforma em um Map.
-        // Esperamos um JSON como: { "email": "...", "senha": "..." }
-
+    public ResponseEntity<?> fazerLogin(@RequestBody LoginRequestDTO loginRequest) {
         try {
-            String email = loginRequest.get("email");
-            String senha = loginRequest.get("senha");
+            // 1. Autentica
+            Usuario usuarioAutenticado = usuarioService.fazerLogin(
+                    loginRequest.getEmail(),
+                    loginRequest.getSenha()
+            );
 
-            // 1. Chama o Service para executar a lógica de negócio (que a outra equipe fará)
-            Usuario usuarioAutenticado = usuarioService.fazerLogin(email, senha);
+            // 2. Gera o Token (AGORA USANDO O SEU NOVO MÉTODO)
+            // Passamos o email e o perfil separadamente, como seu JwtUtil pede
+            String token = jwtUtil.gerarToken(
+                    usuarioAutenticado.getEmail(),
+                    usuarioAutenticado.getPerfil()
+            );
 
-            // 2. Se der certo, retorna 200 OK com os dados do usuário.
-            return ResponseEntity.ok(usuarioAutenticado);
+            // 3. Monta a resposta
+            LoginResponseDTO response = new LoginResponseDTO(
+                    token,
+                    usuarioAutenticado.getId_usuario(),
+                    usuarioAutenticado.getNome(),
+                    usuarioAutenticado.getEmail(),
+                    usuarioAutenticado.getPerfil()
+            );
+
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            // 3. Se o Service lançar um erro (ex: senha errada), retorna 401 Unauthorized.
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erro: Email ou senha inválidos.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erro: " + e.getMessage());
         }
     }
 }

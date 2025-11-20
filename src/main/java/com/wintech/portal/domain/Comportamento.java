@@ -31,7 +31,6 @@ public class Comportamento {
     private Integer assiduidade;
 
     @Column
-    @Lob // A anotação @Lob (Large Object) é útil para campos de texto longos.
     private String observacao;
 
     // --- Relacionamentos ---
