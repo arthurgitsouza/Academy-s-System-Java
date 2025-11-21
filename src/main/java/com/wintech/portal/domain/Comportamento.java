@@ -13,6 +13,8 @@ public class Comportamento {
 
     @Id // Marca o campo como a chave primária (PK).
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Configura a PK para ser autoincrementável.
+    private Double nota;
+    
     private Long id_comportamento;
 
     @Column(name = "data_registro", nullable = false) // Mapeia para a coluna 'data_registro' e a torna obrigatória.
@@ -67,6 +69,14 @@ public class Comportamento {
 
     // Getters e Setters para todos os campos...
 
+    public Double getNota() {
+        return nota;
+    }
+
+    public void setNota(Double nota) {
+        this.nota = nota;
+    }
+    
     public Long getId_comportamento() {
         return id_comportamento;
     }
