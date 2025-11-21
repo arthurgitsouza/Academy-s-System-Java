@@ -4,62 +4,42 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Esta entidade representa um Aluno na escola.
- * É uma especialização da entidade Usuario e contém informações
- * específicas do aluno, como data de nascimento e a turma a que pertence.
- */
-@Entity // Marca a classe como uma entidade JPA.
-@Table(name = "aluno") // Define o nome da tabela no banco de dados.
+@Entity
+@Table(name = "aluno")
 public class Aluno {
 
-    @Id // Marca o campo como a chave primária (PK).
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Configura a PK para ser autoincrementável.
-    private String nome_aluno;
-
-    private String email;
-    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_aluno;
 
-    @Column // Mapeia para a coluna 'foto', que pode armazenar a URL da imagem.
+    // --- REMOVIDO: nome_aluno (Já está em Usuario) ---
+    // --- REMOVIDO: email (Já está em Usuario) ---
+
+    @Column
     private String foto;
 
-    @Column(name = "data_nascimento") // Mapeia para a coluna 'data_nascimento'.
-    private LocalDate dataNascimento; // Usar LocalDate é a prática moderna para datas sem hora.
+    @Column(name = "data_nascimento")
+    private LocalDate dataNascimento;
 
     @Column
     private String telefone;
 
-    @Column(name = "nome_responsavel") // Mapeia para a coluna 'nome_responsavel'.
+    @Column(name = "nome_responsavel")
     private String nomeResponsavel;
 
-    @Column // No seu DER o nome da coluna é 'ativo'.
+    @Column
     private Boolean ativo;
 
     // --- Relacionamentos ---
 
-    /**
-     * Relacionamento Um-para-Um com Usuario.
-     * Cada Aluno corresponde a exatamente um Usuario.
-     */
-    @OneToOne(cascade = CascadeType.ALL) // CascadeType.ALL propaga operações (salvar, deletar) para o Usuario associado.
-    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", unique = true) // Define a coluna 'id_usuario' como a chave estrangeira para a tabela Usuario.
-    private Usuario usuario;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", unique = true)
+    private Usuario usuario; // <--- O Nome e Email vivem AQUI DENTRO
 
-    /**
-     * Relacionamento Muitos-para-Um com Turma.
-     * Muitos Alunos podem pertencer a Uma Turma.
-     * Esta entidade é a "dona" da relação, pois contém a chave estrangeira.
-     */
     @ManyToOne
-    @JoinColumn(name = "id_turma") // Especifica que a coluna 'id_turma' nesta tabela é a chave estrangeira para a tabela Turma.
+    @JoinColumn(name = "id_turma")
     private Turma turma;
 
-    /**
-     * Relacionamento Um-para-Muitos com Comportamento.
-     * Um Aluno pode ter vários registros de comportamento ao longo do tempo.
-     * 'mappedBy = "aluno"' indica que a entidade Comportamento é quem gerencia o relacionamento.
-     */
     @OneToMany(mappedBy = "aluno")
     private List<Comportamento> comportamentos;
 
@@ -67,24 +47,6 @@ public class Aluno {
     // --- Construtores, Getters e Setters ---
 
     public Aluno() {
-    }
-
-    // Getters e Setters para todos os campos...
-
-    public String getNome_aluno() {
-        return nome_aluno;
-    }
-
-    public void setNome_aluno(String nome_aluno) {
-        this.nome_aluno = nome_aluno;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public Long getId_aluno() {

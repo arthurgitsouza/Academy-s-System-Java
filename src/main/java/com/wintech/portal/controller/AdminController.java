@@ -1,9 +1,10 @@
 package com.wintech.portal.controller;
 
-import com.wintech.portal.domain.Aluno;
 import com.wintech.portal.domain.Disciplina;
 import com.wintech.portal.domain.Professor;
 import com.wintech.portal.domain.Turma;
+import com.wintech.portal.dto.AlunoRequestDTO;  // Importando o DTO de entrada
+import com.wintech.portal.dto.AlunoResponseDTO; // Importando o DTO de saída
 import com.wintech.portal.service.AlunoService;
 import com.wintech.portal.service.DisciplinaService;
 import com.wintech.portal.service.ProfessorService;
@@ -14,16 +15,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/admin") // Endereço base para todas as ações do Admin
+@RequestMapping("/api/admin")
 public class AdminController {
 
-    // Este controller precisa de vários "cérebros" para gerenciar tudo
     private final AlunoService alunoService;
     private final ProfessorService professorService;
     private final TurmaService turmaService;
     private final DisciplinaService disciplinaService;
 
-    // O Spring injeta todos os services que pedimos no construtor
     @Autowired
     public AdminController(AlunoService alunoService,
                            ProfessorService professorService,
@@ -35,20 +34,23 @@ public class AdminController {
         this.disciplinaService = disciplinaService;
     }
 
-    // --- Endpoints de Criação ---
-
+    // --- Endpoint de Criação de Aluno (ATUALIZADO PARA DTO) ---
     @PostMapping("/alunos")
-    public ResponseEntity<Aluno> criarAluno(@RequestBody Aluno novoAluno) {
-        // Recebe o objeto Aluno completo do front-end
-        // A camada de Service (que a outra equipe fará) será responsável
-        // por salvar o Aluno e também o Usuario que está dentro dele.
-        Aluno alunoSalvo = alunoService.salvarNovoAluno(novoAluno); // Assumindo o nome do método no service
+    public ResponseEntity<AlunoResponseDTO> criarAluno(@RequestBody AlunoRequestDTO requestDTO) {
+        // 1. Recebe o DTO do Front-end
+        // 2. Passa o DTO para o Service (que vai converter, criptografar senha e salvar)
+        // 3. Recebe o DTO de resposta pronto do Service
+        AlunoResponseDTO alunoSalvo = alunoService.salvarNovoAluno(requestDTO);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(alunoSalvo);
     }
 
+    // --- Outros Endpoints (Professor, Turma, Disciplina) ---
+    // Obs: Idealmente, você faria o mesmo processo de DTOs para Professor também.
+    // Por enquanto, mantive os outros como estavam para focar no conserto do Aluno.
+
     @PostMapping("/professores")
     public ResponseEntity<Professor> criarProfessor(@RequestBody Professor novoProfessor) {
-        // Mesma lógica: recebe o Professor completo
         Professor professorSalvo = professorService.salvarNovoProfessor(novoProfessor);
         return ResponseEntity.status(HttpStatus.CREATED).body(professorSalvo);
     }

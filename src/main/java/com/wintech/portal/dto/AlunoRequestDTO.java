@@ -2,22 +2,23 @@ package com.wintech.portal.dto;
 
 public class AlunoRequestDTO {
 
-    // Dados do Usuário
+    // Dados do Usuário (Login)
     private String nome;
     private String email;
-    private String senha;       // se necessário para cadastro de usuário
-    
+    private String senha;
+
     // Dados Específicos do Aluno
-    private String dataNascimento; // ou LocalDate, se preferir
+    private String dataNascimento;
     private String telefone;
     private String nomeResponsavel;
-    
+
     // Vínculo
     private Long idTurma;
 
     public AlunoRequestDTO() {}
 
-    // getters e setters
+    // --- Getters e Setters ---
+
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 
@@ -30,7 +31,6 @@ public class AlunoRequestDTO {
     public String getDataNascimento() { return dataNascimento; }
     public void setDataNascimento(String dataNascimento) { this.dataNascimento = dataNascimento; }
 
-     // Novos Getters e Setters
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
 
