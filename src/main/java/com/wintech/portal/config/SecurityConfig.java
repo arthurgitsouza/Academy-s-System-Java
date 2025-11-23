@@ -21,65 +21,53 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Permite usar @PreAuthorize nos controllers
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    /**
-     * Configuração principal de segurança da aplicação.
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Desabilita CSRF (não precisamos para APIs REST stateless)
                 .csrf(csrf -> csrf.disable())
-
-                // Configura CORS (permite requisições do front-end Angular)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // Configura as regras de autorização
                 .authorizeHttpRequests(auth -> auth
-                        // Permite acesso público ao endpoint de login
+                        // Permite acesso público ao login
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 
-                        // Permite acesso a recursos estáticos (se houver)
+                        // IMPORTANTE: Permite acesso público aos arquivos estáticos
+                        // Isso permite que as imagens sejam visualizadas sem autenticação
+                        .requestMatchers("/uploads/**").permitAll()
+
+                        // Permite acesso a recursos públicos (se houver)
                         .requestMatchers("/api/public/**").permitAll()
 
                         // TODAS as outras requisições exigem autenticação
                         .anyRequest().authenticated()
                 )
-
-                // Configura sessão como STATELESS (não cria sessão no servidor)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                // Adiciona o filtro JWT ANTES do filtro padrão de autenticação
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    /**
-     * Configuração de CORS (Cross-Origin Resource Sharing).
-     * Permite que o front-end (localhost:4200) faça requisições para o back-end.
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permite requisições vindas do front-end React.js
+        // Permite requisições do front-end React.js
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
 
-        // Permite todos os métodos HTTP (GET, POST, PUT, DELETE, etc.)
+        // Permite todos os métodos HTTP
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         // Permite todos os headers
         configuration.setAllowedHeaders(Arrays.asList("*"));
 
-        // Permite enviar credenciais (cookies, authorization headers)
+        // Permite enviar credenciais
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -88,9 +76,6 @@ public class SecurityConfig {
         return source;
     }
 
-    /**
-     * Bean do PasswordEncoder (para criptografar senhas).
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
