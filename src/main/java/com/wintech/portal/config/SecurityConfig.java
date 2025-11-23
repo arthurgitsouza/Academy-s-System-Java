@@ -33,17 +33,24 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // Permite acesso público ao login
+                        // ✅ Permite login sem autenticação
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // IMPORTANTE: Permite acesso público aos arquivos estáticos
-                        // Isso permite que as imagens sejam visualizadas sem autenticação
+                        // ✅ Permite acesso aos arquivos estáticos
                         .requestMatchers("/uploads/**").permitAll()
 
-                        // Permite acesso a recursos públicos (se houver)
-                        .requestMatchers("/api/public/**").permitAll()
+                        // ✅ IMPORTANTE: Permite rotas de admin para usuários autenticados
+                        // O filtro JWT vai verificar se o usuário tem perfil ADMIN
+                        .requestMatchers("/api/admin/**").authenticated()
 
-                        // TODAS as outras requisições exigem autenticação
+                        // ✅ Permite rotas de professor
+                        .requestMatchers("/api/professor/**").authenticated()
+
+                        // ✅ Permite rotas de aluno
+                        .requestMatchers("/api/aluno/**").authenticated()
+
+                        // Todas as outras requisições exigem autenticação
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
@@ -58,17 +65,20 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permite requisições do front-end React.js
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:5174"
+        ));
 
-        // Permite todos os métodos HTTP
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+        ));
 
-        // Permite todos os headers
         configuration.setAllowedHeaders(Arrays.asList("*"));
-
-        // Permite enviar credenciais
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

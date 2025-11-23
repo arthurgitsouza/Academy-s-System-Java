@@ -56,30 +56,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 4. Se conseguiu extrair o email E o usuário ainda não está autenticado
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            // 5. Buscar o usuário no banco de dados
             Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
 
-            // 6. Validar o token
             if (usuario != null && jwtUtil.validarToken(jwt)) {
 
-                // 7. Extrair o perfil (role) do token
                 String perfil = jwtUtil.extrairPerfil(jwt);
 
-                // 8. Criar a "autoridade" (role) no formato que o Spring Security entende
+                // ✅ IMPORTANTE: Adicionar o prefixo "ROLE_"
                 SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + perfil);
 
-                // 9. Criar o objeto de autenticação
+                System.out.println("✅ Autenticando usuário: " + email + " com perfil: ROLE_" + perfil);
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                usuario, // Principal (o usuário autenticado)
-                                null,    // Credentials (não precisamos da senha aqui)
-                                Collections.singletonList(authority) // Authorities (as permissões)
+                                usuario,
+                                null,
+                                Collections.singletonList(authority)
                         );
 
-                // 10. Adicionar detalhes da requisição (IP, Session ID, etc.)
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // 11. AUTENTICAR o usuário no contexto do Spring Security
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,6 +28,7 @@ public class DashboardAdminController {
      * GET /api/admin/dashboard/usuarios?page=0&size=8&tipo=ALUNO&busca=João
      */
     @GetMapping("/usuarios")
+    @PreAuthorize("hasRole('ADMIN')") // ✅ Só ADMIN pode acessar
     public ResponseEntity<Page<UsuarioCardDTO>> listarUsuarios(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size,
@@ -34,7 +36,6 @@ public class DashboardAdminController {
             @RequestParam(required = false) String busca) {
 
         Pageable pageable = PageRequest.of(page, size);
-
         Page<UsuarioCardDTO> usuarios = service.listarUsuariosComFiltro(tipo, busca, pageable);
 
         return ResponseEntity.ok(usuarios);
@@ -45,9 +46,17 @@ public class DashboardAdminController {
      * POST /api/admin/dashboard/usuarios
      */
     @PostMapping("/usuarios")
+    @PreAuthorize("hasRole('ADMIN')") // ✅ Só ADMIN pode acessar
     public ResponseEntity<UsuarioCardDTO> criarUsuario(@RequestBody CriarUsuarioDTO dto) {
-        UsuarioCardDTO novoUsuario = service.criarUsuario(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
+        try {
+            UsuarioCardDTO novoUsuario = service.criarUsuario(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
+        } catch (Exception e) {
+            // Log do erro
+            System.err.println("Erro ao criar usuário: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     /**
@@ -55,6 +64,7 @@ public class DashboardAdminController {
      * GET /api/admin/dashboard/estatisticas
      */
     @GetMapping("/estatisticas")
+    @PreAuthorize("hasRole('ADMIN')") // ✅ Só ADMIN pode acessar
     public ResponseEntity<?> buscarEstatisticas() {
         return ResponseEntity.ok(service.buscarEstatisticas());
     }
