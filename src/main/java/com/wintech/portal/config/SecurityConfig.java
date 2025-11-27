@@ -27,30 +27,50 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * IMPORTANTE: PasswordEncoder como primeiro Bean para evitar dependências circulares
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Permite login sem autenticação
+                        // ✅ Rotas públicas (sem autenticação)
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // ✅ Permite acesso aos arquivos estáticos
                         .requestMatchers("/uploads/**").permitAll()
 
-                        // ✅ IMPORTANTE: Permite rotas de admin para usuários autenticados
-                        // O filtro JWT vai verificar se o usuário tem perfil ADMIN
+                        // ✅ Rotas de Admin (requer autenticação)
                         .requestMatchers("/api/admin/**").authenticated()
 
-                        // ✅ Permite rotas de professor
+                        // ✅ Rotas de Professor (requer autenticação)
                         .requestMatchers("/api/professor/**").authenticated()
+                        .requestMatchers("/api/professores/**").authenticated()
 
-                        // ✅ Permite rotas de aluno
+                        // ✅ Rotas de Aluno (requer autenticação)
                         .requestMatchers("/api/aluno/**").authenticated()
+                        .requestMatchers("/alunos/**").authenticated()
 
-                        // Todas as outras requisições exigem autenticação
+                        // ✅ Rotas de Simulados (requer autenticação)
+                        .requestMatchers("/api/simulados/**").authenticated()
+
+                        // ✅ Rotas de Upload (requer autenticação)
+                        .requestMatchers("/api/upload/**").authenticated()
+
+                        // ✅ Rotas de Perfil (requer autenticação)
+                        .requestMatchers("/api/perfil/**").authenticated()
+                        .requestMatchers("/api/alunos/*/perfil").authenticated()
+                        .requestMatchers("/api/professores/*/perfil").authenticated()
+                        .requestMatchers("/api/admin/dashboard/alunos/*").authenticated()
+                        .requestMatchers("/api/admin/dashboard/professores/*").authenticated()
+
+                        // ✅ Todas as outras requisições exigem autenticação
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
@@ -65,30 +85,34 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
+        // ✅ Origens permitidas (front-end)
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:5174",
-                "https://daniela-chasmogamous-gabrielle.ngrok-free.dev"
+                "http://localhost:3000",      // React padrão
+                "http://localhost:5173",      // Vite
+                "http://localhost:5174",      // Vite alternativo
+                "https://daniela-chasmogamous-gabrielle.ngrok-free.dev" // Produção/Teste
         ));
 
+        // ✅ Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
         ));
 
+        // ✅ Headers permitidos
         configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // ✅ Permite enviar credenciais (cookies, authorization headers)
         configuration.setAllowCredentials(true);
+
+        // ✅ Headers expostos na resposta
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+        // ✅ Tempo de cache da configuração CORS (1 hora)
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

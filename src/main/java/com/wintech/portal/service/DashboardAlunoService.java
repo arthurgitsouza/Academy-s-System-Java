@@ -35,14 +35,8 @@ public class DashboardAlunoService {
         Aluno aluno = alunoRepository.findById(idAluno)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
+        // ✅ O DTO já preenche tudo no construtor, inclusive as disciplinas
         PerfilAlunoDTO perfil = new PerfilAlunoDTO(aluno);
-
-        // Buscar disciplinas do aluno (TODO: implementar consulta real)
-        List<DisciplinaSimplificadaDTO> disciplinas = new ArrayList<>();
-        for (int i = 1; i <= 6; i++) {
-            disciplinas.add(new DisciplinaSimplificadaDTO((long) i, "Matemática"));
-        }
-        perfil.setDisciplinas(disciplinas);
 
         return perfil;
     }
