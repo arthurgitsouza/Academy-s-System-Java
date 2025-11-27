@@ -46,13 +46,23 @@ public class DashboardAdminController {
      * POST /api/admin/dashboard/usuarios
      */
     @PostMapping("/usuarios")
-    @PreAuthorize("hasRole('ADMIN')") // ✅ Só ADMIN pode acessar
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UsuarioCardDTO> criarUsuario(@RequestBody CriarUsuarioDTO dto) {
         try {
+            // ✅ ADICIONE ESTES LOGS
+            System.out.println("Recebendo requisição para criar usuário");
+            System.out.println("Tipo: " + dto.getTipo());
+            System.out.println("Nome: " + dto.getNomeCompleto());
+            System.out.println("Email: " + dto.getEmail());
+            System.out.println("Data Nascimento: " + dto.getDataNascimento());
+            System.out.println("ID Turma: " + dto.getIdTurma());
+
             UsuarioCardDTO novoUsuario = service.criarUsuario(dto);
+
+            System.out.println("Usuario criado com sucesso: " + novoUsuario.getNome());
+
             return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
         } catch (Exception e) {
-            // Log do erro
             System.err.println("Erro ao criar usuário: " + e.getMessage());
             e.printStackTrace();
             throw e;
@@ -64,7 +74,7 @@ public class DashboardAdminController {
      * GET /api/admin/dashboard/estatisticas
      */
     @GetMapping("/estatisticas")
-    @PreAuthorize("hasRole('ADMIN')") // ✅ Só ADMIN pode acessar
+    @PreAuthorize("hasRole('ADMIN')") //
     public ResponseEntity<?> buscarEstatisticas() {
         return ResponseEntity.ok(service.buscarEstatisticas());
     }
