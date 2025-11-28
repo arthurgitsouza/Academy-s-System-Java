@@ -46,6 +46,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
 
+                        // ✅ Rotas de Perfil (requer autenticação)
+                        .requestMatchers("/api/meu-perfil/**").authenticated()
+                        .requestMatchers("/api/perfil/**").authenticated()
+                        .requestMatchers("/api/alunos/*/perfil").authenticated()
+                        .requestMatchers("/api/professores/*/perfil").authenticated()
+                        .requestMatchers("/api/admin/dashboard/alunos/*").authenticated()
+                        .requestMatchers("/api/admin/dashboard/professores/*").authenticated()
+
                         // ✅ Rotas de Admin (requer autenticação)
                         .requestMatchers("/api/admin/**").authenticated()
 
@@ -62,13 +70,6 @@ public class SecurityConfig {
 
                         // ✅ Rotas de Upload (requer autenticação)
                         .requestMatchers("/api/upload/**").authenticated()
-
-                        // ✅ Rotas de Perfil (requer autenticação)
-                        .requestMatchers("/api/perfil/**").authenticated()
-                        .requestMatchers("/api/alunos/*/perfil").authenticated()
-                        .requestMatchers("/api/professores/*/perfil").authenticated()
-                        .requestMatchers("/api/admin/dashboard/alunos/*").authenticated()
-                        .requestMatchers("/api/admin/dashboard/professores/*").authenticated()
 
                         // ✅ Todas as outras requisições exigem autenticação
                         .anyRequest().authenticated()
