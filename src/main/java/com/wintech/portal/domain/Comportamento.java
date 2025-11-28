@@ -11,20 +11,6 @@ public class Comportamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_comportamento;
 
-    @ManyToOne
-    @JoinColumn(name = "id_aluno", nullable = false)
-    private Aluno aluno;
-
-    @ManyToOne
-    @JoinColumn(name = "id_professor", nullable = false)
-    private Professor professor;
-
-    @Column(name = "ano_letivo", nullable = false)
-    private Integer anoLetivo;
-
-    @Column(nullable = false)
-    private Integer bimestre;
-
     @Column(name = "data_registro", nullable = false)
     private LocalDate dataRegistro;
 
@@ -43,27 +29,28 @@ public class Comportamento {
     @Column(columnDefinition = "TEXT")
     private String observacao;
 
-    @Column(length = 50)
-    private String status;
+    // --- Relacionamentos ---
 
-    // Construtores
-    public Comportamento() {}
+    @ManyToOne
+    @JoinColumn(name = "id_aluno", nullable = false)
+    private Aluno aluno;
 
-    // Getters e Setters
+    @ManyToOne
+    @JoinColumn(name = "id_professor", nullable = false)
+    private Professor professor;
+
+    // --- A CORREÇÃO PARA O CONTROLLER: Adicionado o campo Disciplina ---
+    @ManyToOne
+    @JoinColumn(name = "id_disciplina", nullable = false)
+    private Disciplina disciplina;
+
+    public Comportamento() {
+    }
+
+    // --- Getters e Setters ---
+
     public Long getId_comportamento() { return id_comportamento; }
     public void setId_comportamento(Long id_comportamento) { this.id_comportamento = id_comportamento; }
-
-    public Aluno getAluno() { return aluno; }
-    public void setAluno(Aluno aluno) { this.aluno = aluno; }
-
-    public Professor getProfessor() { return professor; }
-    public void setProfessor(Professor professor) { this.professor = professor; }
-
-    public Integer getAnoLetivo() { return anoLetivo; }
-    public void setAnoLetivo(Integer anoLetivo) { this.anoLetivo = anoLetivo; }
-
-    public Integer getBimestre() { return bimestre; }
-    public void setBimestre(Integer bimestre) { this.bimestre = bimestre; }
 
     public LocalDate getDataRegistro() { return dataRegistro; }
     public void setDataRegistro(LocalDate dataRegistro) { this.dataRegistro = dataRegistro; }
@@ -83,6 +70,13 @@ public class Comportamento {
     public String getObservacao() { return observacao; }
     public void setObservacao(String observacao) { this.observacao = observacao; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Aluno getAluno() { return aluno; }
+    public void setAluno(Aluno aluno) { this.aluno = aluno; }
+
+    public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) { this.professor = professor; }
+
+    // --- Getter e Setter da Disciplina ---
+    public Disciplina getDisciplina() { return disciplina; }
+    public void setDisciplina(Disciplina disciplina) { this.disciplina = disciplina; }
 }

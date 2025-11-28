@@ -59,19 +59,27 @@ public class AlunoResponseDTO {
             return "Sem avaliação";
         }
 
-        // Pega a avaliação mais recente (por ano letivo e bimestre)
+        // Pega a avaliação mais recente (por data de registro)
         Comportamento ultimaAvaliacao = comportamentos.stream()
-                .max(Comparator
-                        .comparingInt(Comportamento::getAnoLetivo)
-                        .thenComparingInt(Comportamento::getBimestre))
+                .max(Comparator.comparing(Comportamento::getDataRegistro))
                 .orElse(null);
 
         if (ultimaAvaliacao == null) {
             return "Sem avaliação";
         }
 
-        // Retorna o status direto ("Excelente", "Bom", "Mediano", "Ruim", "Péssimo")
-        return ultimaAvaliacao.getStatus();
+        // Calcula a média dos 4 critérios
+        double media = (
+                (ultimaAvaliacao.getParticipacao() != null ? ultimaAvaliacao.getParticipacao() : 0) +
+                        (ultimaAvaliacao.getResponsabilidade() != null ? ultimaAvaliacao.getResponsabilidade() : 0) +
+                        (ultimaAvaliacao.getSociabilidade() != null ? ultimaAvaliacao.getSociabilidade() : 0) +
+                        (ultimaAvaliacao.getAssiduidade() != null ? ultimaAvaliacao.getAssiduidade() : 0)
+        ) / 4.0;
+
+        // Retorna o status baseado na média
+        if (media >= 4.5) return "Excelente";
+        if (media >= 3.0) return "Bom";
+        return "Em Risco";
     }
 
     // --- Getters e Setters ---

@@ -7,45 +7,77 @@ public class ComportamentoResponseDTO {
     private Long id;
     private Long alunoId;
     private String alunoNome;
-    private Integer anoLetivo;
-    private Integer bimestre;
+    private String disciplinaNome; // Útil para mostrar no front
+    private String professorNome;  // Útil para saber quem avaliou
+
+    // Notas
     private Integer responsabilidade;
     private Integer participacao;
     private Integer sociabilidade;
     private Integer assiduidade;
+
     private String observacao;
-    private String status;
+    private String status; // Calculado (Excelente, Bom, etc)
     private LocalDate dataRegistro;
 
     public ComportamentoResponseDTO() {}
 
     public ComportamentoResponseDTO(Comportamento c) {
         this.id = c.getId_comportamento();
-        this.alunoId = c.getAluno().getId_aluno();
-        this.alunoNome = c.getAluno().getUsuario() != null ?
-                c.getAluno().getUsuario().getNome() : "";
-        this.anoLetivo = c.getAnoLetivo();
-        this.bimestre = c.getBimestre();
+
+        // Dados do Aluno
+        if (c.getAluno() != null) {
+            this.alunoId = c.getAluno().getId_aluno();
+            if (c.getAluno().getUsuario() != null) {
+                this.alunoNome = c.getAluno().getUsuario().getNome();
+            }
+        }
+
+        // Dados da Disciplina
+        if (c.getDisciplina() != null) {
+            this.disciplinaNome = c.getDisciplina().getNomeDisciplina();
+        }
+
+        // Dados do Professor
+        if (c.getProfessor() != null && c.getProfessor().getUsuario() != null) {
+            this.professorNome = c.getProfessor().getUsuario().getNome();
+        }
+
         this.responsabilidade = c.getResponsabilidade();
         this.participacao = c.getParticipacao();
         this.sociabilidade = c.getSociabilidade();
         this.assiduidade = c.getAssiduidade();
         this.observacao = c.getObservacao();
-        this.status = c.getStatus();
         this.dataRegistro = c.getDataRegistro();
+
+        // CALCULA O STATUS AGORA (Regra de Negócio Visual)
+        this.status = calcularStatus();
     }
 
-    // Getters e Setters
+    private String calcularStatus() {
+        double media = (
+                (this.participacao != null ? this.participacao : 0) +
+                        (this.responsabilidade != null ? this.responsabilidade : 0) +
+                        (this.sociabilidade != null ? this.sociabilidade : 0) +
+                        (this.assiduidade != null ? this.assiduidade : 0)
+        ) / 4.0;
+
+        if (media >= 4.5) return "Excelente";
+        if (media >= 3.0) return "Bom";
+        return "Em Risco";
+    }
+
+    // --- Getters e Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getAlunoId() { return alunoId; }
     public void setAlunoId(Long alunoId) { this.alunoId = alunoId; }
     public String getAlunoNome() { return alunoNome; }
     public void setAlunoNome(String alunoNome) { this.alunoNome = alunoNome; }
-    public Integer getAnoLetivo() { return anoLetivo; }
-    public void setAnoLetivo(Integer anoLetivo) { this.anoLetivo = anoLetivo; }
-    public Integer getBimestre() { return bimestre; }
-    public void setBimestre(Integer bimestre) { this.bimestre = bimestre; }
+    public String getDisciplinaNome() { return disciplinaNome; }
+    public void setDisciplinaNome(String disciplinaNome) { this.disciplinaNome = disciplinaNome; }
+    public String getProfessorNome() { return professorNome; }
+    public void setProfessorNome(String professorNome) { this.professorNome = professorNome; }
     public Integer getResponsabilidade() { return responsabilidade; }
     public void setResponsabilidade(Integer responsabilidade) { this.responsabilidade = responsabilidade; }
     public Integer getParticipacao() { return participacao; }

@@ -6,17 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ComportamentoRepository extends JpaRepository<Comportamento, Long> {
 
-    // Buscar histórico de comportamento do aluno ordenado por bimestre descendente
-    List<Comportamento> findByAlunoOrderByAnoLetivoDescBimestreDesc(Aluno aluno);
+    // ✅ CORRETO: Buscar histórico ordenado pela DATA (mais recente primeiro)
+    // Substitui a busca antiga por Ano/Bimestre que causava erro
+    List<Comportamento> findByAlunoOrderByDataRegistroDesc(Aluno aluno);
 
-    // Buscar comportamento de um aluno em um bimestre específico
-    Optional<Comportamento> findByAlunoAndAnoLetivoAndBimestre(Aluno aluno, Integer anoLetivo, Integer bimestre);
-
-    // Buscar todos os comportamentos de um aluno em um ano letivo
-    List<Comportamento> findByAlunoAndAnoLetivo(Aluno aluno, Integer anoLetivo);
 }
