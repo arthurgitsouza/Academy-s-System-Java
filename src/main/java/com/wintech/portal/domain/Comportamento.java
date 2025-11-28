@@ -11,22 +11,19 @@ public class Comportamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_comportamento;
 
+    @Column(name = "bimestre", nullable = false)
+    private Integer bimestre; // 1, 2, 3 ou 4
+
+    @Column(name = "ano_letivo", nullable = false)
+    private Integer anoLetivo; // Ex: 2024
+
+    @Column(name = "status", nullable = false)
+    private String status; // "Excelente", "Bom", "Mediano", "Ruim", "Péssimo"
+
     @Column(name = "data_registro", nullable = false)
     private LocalDate dataRegistro;
 
-    @Column
-    private Integer participacao;
-
-    @Column
-    private Integer responsabilidade;
-
-    @Column
-    private Integer sociabilidade;
-
-    @Column
-    private Integer assiduidade;
-
-    @Column(columnDefinition = "TEXT") // Lembra da correção do @Lob? Use TEXT.
+    @Column(columnDefinition = "TEXT")
     private String observacao;
 
     // --- Relacionamentos ---
@@ -36,47 +33,85 @@ public class Comportamento {
     private Aluno aluno;
 
     @ManyToOne
-    @JoinColumn(name = "id_disciplina", nullable = false)
-    private Disciplina disciplina;
-
-    @ManyToOne
     @JoinColumn(name = "id_professor", nullable = false)
     private Professor professor;
-
 
     // --- Construtores ---
     public Comportamento() {
     }
 
-    // --- Getters e Setters (APENAS DOS CAMPOS REAIS) ---
+    public Comportamento(Integer bimestre, Integer anoLetivo, String status, Aluno aluno, Professor professor) {
+        this.bimestre = bimestre;
+        this.anoLetivo = anoLetivo;
+        this.status = status;
+        this.dataRegistro = LocalDate.now();
+        this.aluno = aluno;
+        this.professor = professor;
+    }
 
-    public Long getId_comportamento() { return id_comportamento; }
-    public void setId_comportamento(Long id_comportamento) { this.id_comportamento = id_comportamento; }
+    // --- Getters e Setters ---
 
-    public LocalDate getDataRegistro() { return dataRegistro; }
-    public void setDataRegistro(LocalDate dataRegistro) { this.dataRegistro = dataRegistro; }
+    public Long getId_comportamento() {
+        return id_comportamento;
+    }
 
-    public Integer getParticipacao() { return participacao; }
-    public void setParticipacao(Integer participacao) { this.participacao = participacao; }
+    public void setId_comportamento(Long id_comportamento) {
+        this.id_comportamento = id_comportamento;
+    }
 
-    public Integer getResponsabilidade() { return responsabilidade; }
-    public void setResponsabilidade(Integer responsabilidade) { this.responsabilidade = responsabilidade; }
+    public Integer getBimestre() {
+        return bimestre;
+    }
 
-    public Integer getSociabilidade() { return sociabilidade; }
-    public void setSociabilidade(Integer sociabilidade) { this.sociabilidade = sociabilidade; }
+    public void setBimestre(Integer bimestre) {
+        this.bimestre = bimestre;
+    }
 
-    public Integer getAssiduidade() { return assiduidade; }
-    public void setAssiduidade(Integer assiduidade) { this.assiduidade = assiduidade; }
+    public Integer getAnoLetivo() {
+        return anoLetivo;
+    }
 
-    public String getObservacao() { return observacao; }
-    public void setObservacao(String observacao) { this.observacao = observacao; }
+    public void setAnoLetivo(Integer anoLetivo) {
+        this.anoLetivo = anoLetivo;
+    }
 
-    public Aluno getAluno() { return aluno; }
-    public void setAluno(Aluno aluno) { this.aluno = aluno; }
+    public String getStatus() {
+        return status;
+    }
 
-    public Disciplina getDisciplina() { return disciplina; }
-    public void setDisciplina(Disciplina disciplina) { this.disciplina = disciplina; }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-    public Professor getProfessor() { return professor; }
-    public void setProfessor(Professor professor) { this.professor = professor; }
+    public LocalDate getDataRegistro() {
+        return dataRegistro;
+    }
+
+    public void setDataRegistro(LocalDate dataRegistro) {
+        this.dataRegistro = dataRegistro;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
+
+    public Aluno getAluno() {
+        return aluno;
+    }
+
+    public void setAluno(Aluno aluno) {
+        this.aluno = aluno;
+    }
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
 }

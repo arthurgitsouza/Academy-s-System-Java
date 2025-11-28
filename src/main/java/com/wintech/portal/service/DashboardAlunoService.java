@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,35 +34,45 @@ public class DashboardAlunoService {
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         // ✅ O DTO já preenche tudo no construtor, inclusive as disciplinas
-        PerfilAlunoDTO perfil = new PerfilAlunoDTO(aluno);
-
-        return perfil;
+        return new PerfilAlunoDTO(aluno);
     }
 
     /**
      * Buscar histórico de comportamento agrupado por bimestre
+     * NOVO: Usa a nova estrutura de Comportamento (bimestre, anoLetivo, status)
      */
     public List<HistoricoComportamentoDTO> buscarHistoricoPorBimestre(Long idAluno) {
         Aluno aluno = alunoRepository.findById(idAluno)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
+        // ✅ CORRIGIDO: Usar o novo método do repository
         List<Comportamento> comportamentos = comportamentoRepository
-                .findByAlunoOrderByDataRegistroDesc(aluno);
+                .findByAlunoOrderByAnoLetivoDescBimestreDesc(aluno);
 
-        // Agrupar por bimestre
-        Map<Integer, List<Comportamento>> porBimestre = comportamentos.stream()
-                .collect(Collectors.groupingBy(c -> calcularBimestre(c.getDataRegistro())));
+        // Se não há avaliações, retornar histórico vazio
+        if (comportamentos.isEmpty()) {
+            return criarHistoricoVazio();
+        }
+
+        // Agrupar por bimestre (pega o ano letivo mais recente)
+        final Integer anoLetivoAtual = comportamentos.get(0).getAnoLetivo();
 
         List<HistoricoComportamentoDTO> historico = new ArrayList<>();
 
-        for (int bim = 1; bim <= 4; bim++) {
-            List<Comportamento> compsBimestre = porBimestre.getOrDefault(bim, new ArrayList<>());
+        for (int i = 1; i <= 4; i++) {
+            final int bim = i; // ✅ Converter para final para usar na lambda
 
-            String status = calcularStatusBimestre(compsBimestre);
+            // Buscar avaliação deste bimestre no ano letivo atual
+            Comportamento compBimestre = comportamentos.stream()
+                    .filter(c -> c.getBimestre() == bim && c.getAnoLetivo() == anoLetivoAtual)
+                    .findFirst()
+                    .orElse(null);
+
+            String status = compBimestre != null ? compBimestre.getStatus() : "Sem avaliação";
             String periodo = obterPeriodoBimestre(bim);
 
             historico.add(new HistoricoComportamentoDTO(
-                    bim + " Bimestre",
+                    bim + "º Bimestre",
                     periodo,
                     status
             ));
@@ -73,40 +81,38 @@ public class DashboardAlunoService {
         return historico;
     }
 
-    private int calcularBimestre(LocalDate data) {
-        Month mes = data.getMonth();
-        if (mes.getValue() <= 3) return 1;
-        if (mes.getValue() <= 6) return 2;
-        if (mes.getValue() <= 9) return 3;
-        return 4;
+    /**
+     * Criar histórico vazio (quando aluno não tem avaliações)
+     */
+    private List<HistoricoComportamentoDTO> criarHistoricoVazio() {
+        List<HistoricoComportamentoDTO> historico = new ArrayList<>();
+
+        for (int bim = 1; bim <= 4; bim++) {
+            historico.add(new HistoricoComportamentoDTO(
+                    bim + "º Bimestre",
+                    obterPeriodoBimestre(bim),
+                    "Sem avaliação"
+            ));
+        }
+
+        return historico;
     }
 
-    private String calcularStatusBimestre(List<Comportamento> comportamentos) {
-        if (comportamentos.isEmpty()) return "Novo";
-
-        double media = comportamentos.stream()
-                .mapToDouble(c -> {
-                    int soma = (c.getParticipacao() != null ? c.getParticipacao() : 0) +
-                            (c.getResponsabilidade() != null ? c.getResponsabilidade() : 0) +
-                            (c.getSociabilidade() != null ? c.getSociabilidade() : 0) +
-                            (c.getAssiduidade() != null ? c.getAssiduidade() : 0);
-                    return soma / 4.0;
-                })
-                .average()
-                .orElse(0.0);
-
-        if (media >= 4.5) return "Excelente";
-        if (media >= 3.0) return "Bom";
-        return "Em Risco";
-    }
-
+    /**
+     * Obter período do bimestre
+     */
     private String obterPeriodoBimestre(int bimestre) {
         switch (bimestre) {
-            case 1: return "Jan - Mar";
-            case 2: return "Abr - Jun";
-            case 3: return "Jul - Set";
-            case 4: return "Out - Dez";
-            default: return "";
+            case 1:
+                return "Jan - Mar";
+            case 2:
+                return "Abr - Jun";
+            case 3:
+                return "Jul - Set";
+            case 4:
+                return "Out - Dez";
+            default:
+                return "";
         }
     }
 }
