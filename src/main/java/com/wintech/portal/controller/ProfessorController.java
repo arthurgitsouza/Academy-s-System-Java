@@ -49,7 +49,7 @@ public class ProfessorController {
      */
     @PostMapping("/avaliar-comportamento")
     public ResponseEntity<Comportamento> avaliarComportamento(@RequestBody Comportamento novaAvaliacao) {
-        Comportamento avaliacaoSalva = comportamentoService.salvarAvaliacao(novaAvaliacao);
+        Comportamento avaliacaoSalva = comportamentoService.salvar(novaAvaliacao);
         return ResponseEntity.status(HttpStatus.CREATED).body(avaliacaoSalva);
     }
 }
