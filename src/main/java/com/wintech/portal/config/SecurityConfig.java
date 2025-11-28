@@ -71,6 +71,10 @@ public class SecurityConfig {
                         // ✅ Rotas de Upload (requer autenticação)
                         .requestMatchers("/api/upload/**").authenticated()
 
+                        // ✅ Rotas de Comportamento (requer autenticação)
+                        .requestMatchers("/api/avaliar-comportamento").authenticated()
+                        .requestMatchers("/api/comportamento/**").authenticated()
+
                         // ✅ Todas as outras requisições exigem autenticação
                         .anyRequest().authenticated()
                 )

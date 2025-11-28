@@ -11,36 +11,6 @@ public class Comportamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_comportamento;
 
-    @Column(name = "bimestre", nullable = false)
-    private Integer bimestre; // 1, 2, 3 ou 4
-
-    @Column(name = "ano_letivo", nullable = false)
-    private Integer anoLetivo; // Ex: 2024
-
-    // ===== CAMPOS QUE O FRONT ENVIA =====
-    @Column(name = "responsabilidade")
-    private Integer responsabilidade; // 1 a 5
-
-    @Column(name = "participacao")
-    private Integer participacao; // 1 a 5
-
-    @Column(name = "sociabilidade")
-    private Integer sociabilidade; // 1 a 5
-
-    @Column(name = "assiduidade")
-    private Integer assiduidade; // 1 a 5
-    // =====================================
-
-    @Column(name = "status", nullable = false)
-    private String status; // "Excelente", "Bom", "Mediano", "Ruim", "Péssimo"
-
-    @Column(name = "data_registro", nullable = false)
-    private LocalDate dataRegistro;
-
-    @Column(columnDefinition = "TEXT")
-    private String observacao;
-
-    // --- Relacionamentos ---
     @ManyToOne
     @JoinColumn(name = "id_aluno", nullable = false)
     private Aluno aluno;
@@ -49,104 +19,70 @@ public class Comportamento {
     @JoinColumn(name = "id_professor", nullable = false)
     private Professor professor;
 
-    // --- Construtores ---
-    public Comportamento() {
-    }
+    @Column(name = "ano_letivo", nullable = false)
+    private Integer anoLetivo;
 
-    // --- Getters e Setters ---
-    public Long getId_comportamento() {
-        return id_comportamento;
-    }
+    @Column(nullable = false)
+    private Integer bimestre;
 
-    public void setId_comportamento(Long id_comportamento) {
-        this.id_comportamento = id_comportamento;
-    }
+    @Column(name = "data_registro", nullable = false)
+    private LocalDate dataRegistro;
 
-    public Integer getBimestre() {
-        return bimestre;
-    }
+    @Column
+    private Integer participacao;
 
-    public void setBimestre(Integer bimestre) {
-        this.bimestre = bimestre;
-    }
+    @Column
+    private Integer responsabilidade;
 
-    public Integer getAnoLetivo() {
-        return anoLetivo;
-    }
+    @Column
+    private Integer sociabilidade;
 
-    public void setAnoLetivo(Integer anoLetivo) {
-        this.anoLetivo = anoLetivo;
-    }
+    @Column
+    private Integer assiduidade;
 
-    public Integer getResponsabilidade() {
-        return responsabilidade;
-    }
+    @Column(columnDefinition = "TEXT")
+    private String observacao;
 
-    public void setResponsabilidade(Integer responsabilidade) {
-        this.responsabilidade = responsabilidade;
-    }
+    @Column(length = 50)
+    private String status;
 
-    public Integer getParticipacao() {
-        return participacao;
-    }
+    // Construtores
+    public Comportamento() {}
 
-    public void setParticipacao(Integer participacao) {
-        this.participacao = participacao;
-    }
+    // Getters e Setters
+    public Long getId_comportamento() { return id_comportamento; }
+    public void setId_comportamento(Long id_comportamento) { this.id_comportamento = id_comportamento; }
 
-    public Integer getSociabilidade() {
-        return sociabilidade;
-    }
+    public Aluno getAluno() { return aluno; }
+    public void setAluno(Aluno aluno) { this.aluno = aluno; }
 
-    public void setSociabilidade(Integer sociabilidade) {
-        this.sociabilidade = sociabilidade;
-    }
+    public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) { this.professor = professor; }
 
-    public Integer getAssiduidade() {
-        return assiduidade;
-    }
+    public Integer getAnoLetivo() { return anoLetivo; }
+    public void setAnoLetivo(Integer anoLetivo) { this.anoLetivo = anoLetivo; }
 
-    public void setAssiduidade(Integer assiduidade) {
-        this.assiduidade = assiduidade;
-    }
+    public Integer getBimestre() { return bimestre; }
+    public void setBimestre(Integer bimestre) { this.bimestre = bimestre; }
 
-    public String getStatus() {
-        return status;
-    }
+    public LocalDate getDataRegistro() { return dataRegistro; }
+    public void setDataRegistro(LocalDate dataRegistro) { this.dataRegistro = dataRegistro; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public Integer getParticipacao() { return participacao; }
+    public void setParticipacao(Integer participacao) { this.participacao = participacao; }
 
-    public LocalDate getDataRegistro() {
-        return dataRegistro;
-    }
+    public Integer getResponsabilidade() { return responsabilidade; }
+    public void setResponsabilidade(Integer responsabilidade) { this.responsabilidade = responsabilidade; }
 
-    public void setDataRegistro(LocalDate dataRegistro) {
-        this.dataRegistro = dataRegistro;
-    }
+    public Integer getSociabilidade() { return sociabilidade; }
+    public void setSociabilidade(Integer sociabilidade) { this.sociabilidade = sociabilidade; }
 
-    public String getObservacao() {
-        return observacao;
-    }
+    public Integer getAssiduidade() { return assiduidade; }
+    public void setAssiduidade(Integer assiduidade) { this.assiduidade = assiduidade; }
 
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
-    }
+    public String getObservacao() { return observacao; }
+    public void setObservacao(String observacao) { this.observacao = observacao; }
 
-    public Aluno getAluno() {
-        return aluno;
-    }
-
-    public void setAluno(Aluno aluno) {
-        this.aluno = aluno;
-    }
-
-    public Professor getProfessor() {
-        return professor;
-    }
-
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
