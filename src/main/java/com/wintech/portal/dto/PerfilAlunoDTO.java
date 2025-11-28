@@ -6,6 +6,7 @@ import com.wintech.portal.domain.Comportamento;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,7 @@ public class PerfilAlunoDTO {
     private String turma;
     private String idMatricula; // Formato: #015 dígitos
     private String statusMatricula; // "Matriculado" ou "Inativo"
-    private String statusComportamento; // "Excelente", "Bom", "Em Risco"
+    private String statusComportamento; // "Excelente", "Bom", "Mediano", "Ruim", "Péssimo"
     private List<String> disciplinas;
     private List<ComportamentoHistoricoDTO> comportamentoHistorico;
 
@@ -81,55 +82,127 @@ public class PerfilAlunoDTO {
                 ? "Matriculado"
                 : "Inativo";
 
-        // Status de comportamento
-        this.statusComportamento = calcularStatusComportamento(aluno);
+        // Status de comportamento (última avaliação)
+        this.statusComportamento = buscarStatusGeralDoAluno(aluno.getComportamentos());
 
-        // Disciplinas (simulado - você pode buscar do banco depois)
-        this.disciplinas = List.of("Matemática", "História", "Geografia",
-                "Ciências", "Português", "Inglês");
+        // Disciplinas da turma
+        this.disciplinas = buscarDisciplinasDaTurma(aluno);
 
-        // Histórico de comportamento
+        // Histórico de comportamento por bimestre
         this.comportamentoHistorico = gerarHistoricoComportamento(aluno);
     }
 
+    /**
+     * Calcula idade a partir da data de nascimento
+     */
     private Integer calcularIdade(LocalDate dataNascimento) {
         if (dataNascimento == null) return null;
         return Period.between(dataNascimento, LocalDate.now()).getYears();
     }
 
-    private String calcularStatusComportamento(Aluno aluno) {
-        if (aluno.getComportamentos() == null || aluno.getComportamentos().isEmpty()) {
-            return "Novo";
+    /**
+     * Busca o status geral do aluno (última avaliação de comportamento)
+     */
+    private String buscarStatusGeralDoAluno(List<Comportamento> comportamentos) {
+        if (comportamentos == null || comportamentos.isEmpty()) {
+            return "Sem avaliação";
         }
 
-        double media = aluno.getComportamentos().stream()
-                .mapToDouble(c -> {
-                    int soma = (c.getParticipacao() != null ? c.getParticipacao() : 0) +
-                            (c.getResponsabilidade() != null ? c.getResponsabilidade() : 0) +
-                            (c.getSociabilidade() != null ? c.getSociabilidade() : 0) +
-                            (c.getAssiduidade() != null ? c.getAssiduidade() : 0);
-                    return soma / 4.0;
-                })
-                .average()
-                .orElse(0.0);
+        // Pega a avaliação mais recente (por ano letivo e bimestre)
+        Comportamento ultimaAvaliacao = comportamentos.stream()
+                .max(Comparator
+                        .comparingInt(Comportamento::getAnoLetivo)
+                        .thenComparingInt(Comportamento::getBimestre))
+                .orElse(null);
 
-        if (media >= 4.5) return "Excelente";
-        if (media >= 3.0) return "Bom";
-        return "Em Risco";
+        if (ultimaAvaliacao == null) {
+            return "Sem avaliação";
+        }
+
+        return ultimaAvaliacao.getStatus();
     }
 
+    /**
+     * Busca disciplinas da turma do aluno
+     * As disciplinas estão em TurmaDisciplina, não diretamente em Turma
+     */
+    private List<String> buscarDisciplinasDaTurma(Aluno aluno) {
+        if (aluno.getTurma() == null || aluno.getTurma().getTurmaDisciplinas() == null) {
+            return new ArrayList<>();
+        }
+
+        return aluno.getTurma().getTurmaDisciplinas().stream()
+                .map(turmaDisciplina -> turmaDisciplina.getDisciplina().getNomeDisciplina())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gera histórico de comportamento agrupado por bimestre
+     * Usa a nova estrutura: bimestre, anoLetivo, status
+     */
     private List<ComportamentoHistoricoDTO> gerarHistoricoComportamento(Aluno aluno) {
         List<ComportamentoHistoricoDTO> historico = new ArrayList<>();
 
-        // Simulando histórico por bimestre
-        // TODO: Implementar lógica real baseada em datas dos comportamentos
-        historico.add(new ComportamentoHistoricoDTO("1 Bimestre", "Jan - Mar", "Excelente"));
-        historico.add(new ComportamentoHistoricoDTO("2 Bimestre", "Abril - Jun", "Bom"));
+        if (aluno.getComportamentos() == null || aluno.getComportamentos().isEmpty()) {
+            // Se não há avaliações, retorna histórico vazio
+            for (int bim = 1; bim <= 4; bim++) {
+                historico.add(new ComportamentoHistoricoDTO(
+                        bim + "º Bimestre",
+                        obterPeriodoBimestre(bim),
+                        "Sem avaliação"
+                ));
+            }
+            return historico;
+        }
+
+        // Pega o ano letivo mais recente
+        Integer anoLetivoAtual = aluno.getComportamentos().stream()
+                .map(Comportamento::getAnoLetivo)
+                .max(Integer::compareTo)
+                .orElse(LocalDate.now().getYear());
+
+        // Cria entrada para cada bimestre
+        for (int bim = 1; bim <= 4; bim++) {
+            final int bimestre = bim;
+
+            // Busca avaliação deste bimestre no ano letivo atual
+            Comportamento compBimestre = aluno.getComportamentos().stream()
+                    .filter(c -> c.getBimestre() == bimestre && c.getAnoLetivo() == anoLetivoAtual)
+                    .findFirst()
+                    .orElse(null);
+
+            String status = compBimestre != null ? compBimestre.getStatus() : "Sem avaliação";
+
+            historico.add(new ComportamentoHistoricoDTO(
+                    bim + "º Bimestre",
+                    obterPeriodoBimestre(bim),
+                    status
+            ));
+        }
 
         return historico;
     }
 
-    // Getters e Setters completos
+    /**
+     * Obtém período do bimestre
+     */
+    private String obterPeriodoBimestre(int bimestre) {
+        switch (bimestre) {
+            case 1:
+                return "Jan - Mar";
+            case 2:
+                return "Abr - Jun";
+            case 3:
+                return "Jul - Set";
+            case 4:
+                return "Out - Dez";
+            default:
+                return "";
+        }
+    }
+
+    // ===== GETTERS E SETTERS =====
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
